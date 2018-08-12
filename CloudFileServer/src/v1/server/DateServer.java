@@ -12,8 +12,15 @@ public class DateServer {
             Socket soc = s.accept();
             DataOutputStream out = new DataOutputStream(soc.getOutputStream());
             DataOutputStream out2 = new DataOutputStream(soc.getOutputStream());
-            out.writeBytes("Server Date: " + (new Date()).toString());
-            out2.writeBytes("\n Data Sent!");
+            BufferedReader in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
+            if(in.read() == 1) {
+            	out.writeBytes("Server Date: " + (new Date()).toString());
+            }
+            else {
+            	out.writeBytes("Server Address: " + InetAddress.getLocalHost());
+            }
+//            out.writeBytes("Server Date: " + (new Date()).toString());
+            out2.writeBytes(" \n Data Sent!");
             out.close();
             out2.close();
             soc.close();
