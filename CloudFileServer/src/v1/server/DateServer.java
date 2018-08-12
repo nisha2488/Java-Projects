@@ -12,8 +12,8 @@ public class DateServer {
             Socket soc = s.accept();
             DataOutputStream out = new DataOutputStream(soc.getOutputStream());
             DataOutputStream out2 = new DataOutputStream(soc.getOutputStream());
-            out.writeBytes("Server Date: " + (new Date()).toString() + "\n");
-            out2.writeBytes("Nothing!");
+            out.writeBytes("Server Date: " + (new Date()).toString());
+            out2.writeBytes("\n Data Sent!");
             out.close();
             out2.close();
             soc.close();
