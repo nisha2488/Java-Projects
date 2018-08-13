@@ -1,40 +1,61 @@
 package v2.server;
 
 import java.net.*;
+import java.time.LocalDateTime;
 import java.io.*;
 import java.util.*;
 
 public class DateServer {
-	public static void main(String args[]) throws Exception {
-        ServerSocket s=new ServerSocket(5217);
-        while(true) {
-            System.out.println("Waiting For Connection ...");
-            Socket soc = s.accept();
-            DataOutputStream out = new DataOutputStream(soc.getOutputStream());
-            DataOutputStream out2 = new DataOutputStream(soc.getOutputStream());
-            BufferedReader in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
-            if(in.read() == 1) {
-            	out.writeBytes("Server Date: " + (new Date()).toString());
-            }
-            else {
-            	out.writeBytes("Server Address: " + InetAddress.getLocalHost());
-            }
-//            out.writeBytes("Server Date: " + (new Date()).toString());
-            out2.writeBytes(" \n Data Sent!");
-            out.close();
-            out2.close();
-            soc.close();
-            s.close();
-        }
+	public static void main(String args[]) throws IOException {
+		ServerSocket s = new ServerSocket(5217);
+		try {
+			while (true) {
+				System.out.println("Waiting For Connection ...");
+				Socket soc = s.accept();
+				initializeSlaveForClient(soc);
+			}
+		} catch (Throwable t) {
+			s.close();
+		}
+	}
 
-    }
+	private static void initializeSlaveForClient(Socket soc) {
+		DateServerSlave dss = new DateServerSlave(soc);
+		// Schedules a new thread and lets the current thread continue (back to main function)
+		new Thread(dss).start(); 
+	}
 }
 
+// Multi-threading to handle multiple client requests.
 
-//--- 
+class DateServerSlave implements Runnable {
 
-//class DateServerSlave implements Runnable {
-//  public void run() {
-//
-//  }
-//}
+	Socket soc;
+
+	DateServerSlave(Socket soc) {
+		this.soc = soc;
+	}
+
+	@Override
+	public void run() {
+		try {
+			DataOutputStream out = new DataOutputStream(soc.getOutputStream());
+	        BufferedReader in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
+	        if(in.read() == 1) {
+	        	out.writeBytes("Server Date: " + (new Date()).toString());
+	        	out.writeBytes("Current thread put to sleep at : " + (LocalDateTime.now()).toString());
+	        	//Sleep for 20 seconds to test multi-threading
+	        	Thread.sleep(20000);
+	        	out.writeBytes("Current thread back to runnable at : " + (LocalDateTime.now()).toString());
+	        } else {
+	        	out.writeBytes("Server Address: " + InetAddress.getLocalHost());
+	        	out.writeBytes("Current thread executed at : " + (LocalDateTime.now()).toString());
+	        }
+	        out.close();
+	        soc.close();
+		} catch (Throwable t) {
+			System.err.println("Throwable Caught in DateServerSlave:");
+			t.printStackTrace();
+		}
+	}
+}
