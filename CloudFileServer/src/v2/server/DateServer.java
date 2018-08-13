@@ -45,7 +45,7 @@ class DateServerSlave implements Runnable {
 	        	out.writeBytes("Server Date: " + (new Date()).toString());
 	        	out.writeBytes("Current thread put to sleep at : " + (LocalDateTime.now()).toString());
 	        	//Sleep for 20 seconds to test multi-threading
-	        	Thread.sleep(20000);
+//	        	Thread.sleep(20000);
 	        	out.writeBytes("Current thread back to runnable at : " + (LocalDateTime.now()).toString());
 	        } else {
 	        	out.writeBytes("Server Address: " + InetAddress.getLocalHost());
