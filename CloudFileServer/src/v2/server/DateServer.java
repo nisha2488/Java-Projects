@@ -38,6 +38,7 @@ class DateServerSlave implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println("DateServerSlave starting for : " + soc.getRemoteSocketAddress().toString());
 		try {
 			DataOutputStream out = new DataOutputStream(soc.getOutputStream());
 	        BufferedReader in = new BufferedReader(new InputStreamReader(soc.getInputStream()));
