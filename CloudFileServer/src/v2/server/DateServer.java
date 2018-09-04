@@ -45,9 +45,9 @@ class DateServerSlave implements Runnable {
 	        if(in.read() == 1) {
 	        	System.out.println("Connection accepted for client: " + soc.getRemoteSocketAddress().toString());
 	        	out.writeBytes("Server Date: " + (new Date()).toString());
-//	        	out.writeBytes("Current thread put to sleep at : " + (LocalDateTime.now()).toString());
-	        	//Sleep for 20 seconds to test multi-threading
-//	        	Thread.sleep(20000);
+	        	System.out.println("Current slave put to sleep for client: " + soc.getRemoteSocketAddress().toString());
+	        	//Sleep for 60 seconds to test multi-threading
+	        	Thread.sleep(60000);
 //	        	out.writeBytes("Current thread back to runnable at : " + (LocalDateTime.now()).toString());
 	        	System.out.println("Data sent back to the client: " + soc.getRemoteSocketAddress().toString());
 	        } else {
