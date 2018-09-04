@@ -21,6 +21,7 @@ public class DateClient {
 				if(option == 1 || option == 2) {
 					Socket soc = new Socket("192.168.56.110", 5217);   
 			        DataOutputStream out = new DataOutputStream(soc.getOutputStream());
+			        out.writeByte(option);
 			        BufferedReader in= new BufferedReader(new InputStreamReader(soc.getInputStream()));
 			        StringBuilder sb = new StringBuilder();
 			        while(true) {
