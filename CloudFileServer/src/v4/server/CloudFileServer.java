@@ -81,7 +81,7 @@ class CloudFileServerSlave implements Runnable {
 				FileManifest currentFile = new FileManifest();
 				currentFile.fileName = file.getName();
 				currentFile.fileSize = (int) file.length();
-				currentFile.numChunks = (int) (currentFile.fileSize/(CloudFileReader.CHUNK_SIZE));
+				currentFile.numChunks = (int) Math.ceil((currentFile.fileSize/(CloudFileReader.CHUNK_SIZE)));
 				fileManifests.fileManifestList.add(currentFile);
 			}
 		}
