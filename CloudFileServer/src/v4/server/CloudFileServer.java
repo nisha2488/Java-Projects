@@ -67,7 +67,8 @@ class CloudFileServerSlave implements Runnable {
 	        out.close();
 	        soc.close();
 		} catch (Throwable t) {
-			System.err.println("Throwable Caught in CloudFileServerSlave:" + t.getCause());
+			System.err.println("Throwable Caught in CloudFileServerSlave:");
+			t.printStackTrace();
 		}
 	}
 
