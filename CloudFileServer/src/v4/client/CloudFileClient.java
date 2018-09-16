@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.UUID;
 
+import v4.common.CloudFileReader;
+import v4.common.CloudFileWriter;
 import v4.common.types.ClientMessage;
 import v4.common.types.FileListServerMessage;
 import v4.common.types.FileManifest;
@@ -47,14 +49,22 @@ public class CloudFileClient {
         ObjectInputStream in = new ObjectInputStream(soc.getInputStream());
     	if(message.messageType == MessageType.GET_FILE_MANIFESTS){
     		out.writeObject(message);
-    		FileListServerMessage returnMessage = (FileListServerMessage) in.readObject();
-    	    readServerFileLists((FileListServerMessage)returnMessage);
+//    		FileListServerMessage returnMessage = (FileListServerMessage) in.readObject();
+    	    readServerFileLists((FileListServerMessage) in.readObject());
     	} else if(message.messageType == MessageType.GET_FILE){
-    		out.writeObject((GetFileClientMessage)message);
-    		ServerMessage returnMessage = (ServerMessage) in.readObject();
-    		
+    		GetFileClientMessage clientMessage = (GetFileClientMessage)message; 
+    		out.writeObject(clientMessage);
+    		downloadServerFile((ServerMessage) in.readObject(), clientMessage.fileName);
     	}
 		
+	}
+
+	private void downloadServerFile(ServerMessage returnMessage, String fileName) throws IOException {
+		if(returnMessage.hasError == true) {
+			System.out.println("Invalid File Name");
+		} else {
+			new CloudFileWriter().writeFileContents(fileName, returnMessage.message);
+		}
 	}
 
 	private void readServerFileLists(FileListServerMessage serverFileList) {
