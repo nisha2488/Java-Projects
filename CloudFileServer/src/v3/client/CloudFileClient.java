@@ -3,6 +3,11 @@ package v3.client;
 import java.io.*;
 import java.net.*;
 import java.util.UUID;
+
+import v3.common.types.ClientMessage;
+import v3.common.types.MessageType;
+import v3.common.types.ServerMessage;
+
 import java.util.Scanner;
 
 public class CloudFileClient {
@@ -19,19 +24,18 @@ public class CloudFileClient {
 							+ "\n 1. Server Time \n 2. Server Address \n 3. Exit Process");
 				int option = reader.nextInt();
 				if(option == 1 || option == 2) {
+					ClientMessage message = new ClientMessage();
+					message.clientID = InetAddress.getLocalHost().toString();
+					if(option == 1)
+						message.messageType = MessageType.GET_TIME;
+					else
+						message.messageType = MessageType.GET_SERVER_ADDRESS;
 					Socket soc = new Socket("192.168.56.110", 5217);   
-			        DataOutputStream out = new DataOutputStream(soc.getOutputStream());
-			        out.writeByte(option);
-			        BufferedReader in= new BufferedReader(new InputStreamReader(soc.getInputStream()));
-			        StringBuilder sb = new StringBuilder();
-			        while(true) {
-			        	String currentLine = in.readLine();
-			        	if(currentLine == null || currentLine.isEmpty()) {
-			        		break;
-			        	}
-			        	sb.append(currentLine);
-			        }
-			        System.out.println(sb);
+					ObjectOutputStream out = new ObjectOutputStream(soc.getOutputStream());
+			        out.writeObject(message);
+			        ObjectInputStream in = new ObjectInputStream(soc.getInputStream());
+			        ServerMessage returnMessage = (ServerMessage) in.readObject();
+			        System.out.println(returnMessage.message);
 				}
 				if(option == 3) {
 					System.out.println("Closing client " + clientID); 
