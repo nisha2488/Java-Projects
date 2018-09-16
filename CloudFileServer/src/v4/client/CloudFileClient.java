@@ -7,6 +7,7 @@ import java.util.UUID;
 import v4.common.types.ClientMessage;
 import v4.common.types.FileListServerMessage;
 import v4.common.types.FileManifest;
+import v4.common.types.GetFileClientMessage;
 import v4.common.types.MessageType;
 import v4.common.types.ServerMessage;
 
@@ -32,7 +33,7 @@ public class CloudFileClient {
 				} else {
 					ClientMessage message = buildClientMessage(option);
 					Socket soc = new Socket("192.168.56.110", 5217); 
-					callServerHandler(soc, message);
+					handle(soc, message);
 				}
 				
 			}
@@ -41,7 +42,7 @@ public class CloudFileClient {
 		}
 	}
 	
-	private void callServerHandler(Socket soc, ClientMessage message) throws Exception {
+	private void handle(Socket soc, ClientMessage message) throws Exception {
 		ObjectOutputStream out = new ObjectOutputStream(soc.getOutputStream());
         ObjectInputStream in = new ObjectInputStream(soc.getInputStream());
     	if(message.messageType == MessageType.GET_FILE_MANIFESTS){
@@ -49,6 +50,7 @@ public class CloudFileClient {
     		FileListServerMessage returnMessage = (FileListServerMessage) in.readObject();
     	    readServerFileLists((FileListServerMessage)returnMessage);
     	} else if(message.messageType == MessageType.GET_FILE){
+    		out.writeObject((GetFileClientMessage)message);
     		ServerMessage returnMessage = (ServerMessage) in.readObject();
     		
     	}
@@ -63,27 +65,43 @@ public class CloudFileClient {
 	}
 
 	private ClientMessage buildClientMessage(int option) {
-		ClientMessage message = new ClientMessage();
-		try {
-			message.clientID = InetAddress.getLocalHost().toString();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			message.clientID = "Cannot get localHost";
-		}
-		if(option == 1) {
-			message.messageType = MessageType.GET_FILE_MANIFESTS;
-		} 
-		if(option == 2) {
-			message.messageType = MessageType.GET_FILE;
-		}
-		if(option == 3) {
-			message.messageType = MessageType.GET_FILE_CHUNK;
-		}
-		return message;
+			if(option == 1) {
+				ClientMessage message = new ClientMessage();
+				message.clientID = getClientID();
+				message.messageType = MessageType.GET_FILE_MANIFESTS;
+				return message;
+			} else if(option == 2) {
+				GetFileClientMessage message = new GetFileClientMessage(getfileName());
+				message.clientID = getClientID();
+				return message;
+			} else if(option == 3) {
+				ClientMessage message = new ClientMessage();
+				message.clientID = getClientID();
+				message.messageType = MessageType.GET_FILE_CHUNK;
+				return message;
+			} else {
+				throw new RuntimeException();
+			}
 	}
 	
 	
+	private String getfileName() {
+		Scanner reader = new Scanner(System.in);
+		System.out.println("Enter the file name to download:");
+		String fileName = reader.nextLine();
+		reader.close();
+		return fileName;
+	}
+
+	private String getClientID() {
+		try {
+			return InetAddress.getLocalHost().getCanonicalHostName();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return "0000"; 
+		}
+	}
+
 	public static void main(String args[]) throws Exception {
         new CloudFileClient(UUID.randomUUID().toString());
     }    

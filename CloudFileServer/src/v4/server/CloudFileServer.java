@@ -8,6 +8,7 @@ import v4.common.CloudFileReader;
 import v4.common.types.ClientMessage;
 import v4.common.types.FileListServerMessage;
 import v4.common.types.FileManifest;
+import v4.common.types.GetFileClientMessage;
 import v4.common.types.MessageType;
 import v4.common.types.ServerMessage;
 
@@ -48,29 +49,38 @@ class CloudFileServerSlave implements Runnable {
 		try {
 			ObjectOutputStream out = new ObjectOutputStream(soc.getOutputStream());
 			ObjectInputStream in = new ObjectInputStream(soc.getInputStream());
-	        ClientMessage message = (ClientMessage)in.readObject();
-	        ServerMessage returnMessage = new ServerMessage();
-	        returnMessage.messageType = message.messageType;
-//			if(message.messageType == MessageType.GET_TIME) {
-//	        	System.out.println("Connection accepted for client: " + message.clientID);
-//	        	returnMessage.message = "Server Date: " + (new Date()).toString();
-//	        	out.writeObject(returnMessage);
-//	        	System.out.println("Data sent back to the client: " + message.clientID);
-//	        } else if(message.messageType == MessageType.GET_SERVER_ADDRESS) {
-//	        	returnMessage.message = "Server Address: " + InetAddress.getLocalHost();
-//	        	out.writeObject(returnMessage);
-//	        } else 
-	        if(message.messageType == MessageType.GET_FILE_MANIFESTS) {
-				out.writeObject(getFileManifests());
-			} else {
-				throw new RuntimeException("Unknown messageType: " + message.messageType);
-			}
+			ClientMessage message = (ClientMessage)in.readObject();
+			sendResponse(out, message);
 	        out.close();
 	        soc.close();
 		} catch (Throwable t) {
 			System.err.println("Throwable Caught in CloudFileServerSlave:");
 			t.printStackTrace();
 		}
+	}
+
+	private void sendResponse(ObjectOutputStream out, ClientMessage message) throws Exception {
+        if(message.messageType == MessageType.GET_FILE_MANIFESTS) {
+			out.writeObject(getFileManifests());
+        } else if(message.messageType == MessageType.GET_FILE) {
+        	out.writeObject(getFile((GetFileClientMessage)message));
+		} else {
+			throw new RuntimeException("Unknown messageType: " + message.messageType);
+		}
+		
+	}
+
+	private ServerMessage getFile(GetFileClientMessage message) throws IOException {
+		ServerMessage returnMessage = new ServerMessage();
+		String fileName = CloudFileReader.FILE_DIR + message.fileName;
+		File file = new File(fileName);
+		if(file.exists()) {
+			returnMessage.hasError = false;
+			returnMessage.message = new CloudFileReader().readFileContents(fileName);
+		} else {
+			returnMessage.hasError = true;
+		}
+		return returnMessage;
 	}
 
 	private FileListServerMessage getFileManifests() {
