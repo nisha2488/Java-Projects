@@ -104,7 +104,7 @@ class CloudFileServerSlave implements Runnable {
 			returnMessage.message = new CloudFileReader().readFileContents(fileName);
 		} else {
 			returnMessage.hasError = true;
-			returnMessage.errorCause = "Invalid File Name";
+			returnMessage.errorCause = "Invalid File Name!";
 		}
 		return returnMessage;
 	}
