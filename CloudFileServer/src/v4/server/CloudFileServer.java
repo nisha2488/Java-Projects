@@ -51,15 +51,16 @@ class CloudFileServerSlave implements Runnable {
 	        ClientMessage message = (ClientMessage)in.readObject();
 	        ServerMessage returnMessage = new ServerMessage();
 	        returnMessage.messageType = message.messageType;
-			if(message.messageType == MessageType.GET_TIME) {
-	        	System.out.println("Connection accepted for client: " + message.clientID);
-	        	returnMessage.message = "Server Date: " + (new Date()).toString();
-	        	out.writeObject(returnMessage);
-	        	System.out.println("Data sent back to the client: " + message.clientID);
-	        } else if(message.messageType == MessageType.GET_SERVER_ADDRESS) {
-	        	returnMessage.message = "Server Address: " + InetAddress.getLocalHost();
-	        	out.writeObject(returnMessage);
-	        } else if(message.messageType == MessageType.GET_FILE_MANIFESTS) {
+//			if(message.messageType == MessageType.GET_TIME) {
+//	        	System.out.println("Connection accepted for client: " + message.clientID);
+//	        	returnMessage.message = "Server Date: " + (new Date()).toString();
+//	        	out.writeObject(returnMessage);
+//	        	System.out.println("Data sent back to the client: " + message.clientID);
+//	        } else if(message.messageType == MessageType.GET_SERVER_ADDRESS) {
+//	        	returnMessage.message = "Server Address: " + InetAddress.getLocalHost();
+//	        	out.writeObject(returnMessage);
+//	        } else 
+	        if(message.messageType == MessageType.GET_FILE_MANIFESTS) {
 				out.writeObject(getFileManifests());
 			} else {
 				throw new RuntimeException("Unknown messageType: " + message.messageType);
