@@ -56,13 +56,13 @@ class CloudFileServerSlave implements Runnable {
 	        	returnMessage.message = "Server Date: " + (new Date()).toString();
 	        	out.writeObject(returnMessage);
 	        	System.out.println("Data sent back to the client: " + message.clientID);
-	        } 
-			if(message.messageType == MessageType.GET_SERVER_ADDRESS) {
+	        } else if(message.messageType == MessageType.GET_SERVER_ADDRESS) {
 	        	returnMessage.message = "Server Address: " + InetAddress.getLocalHost();
 	        	out.writeObject(returnMessage);
-	        }
-			if(message.messageType == MessageType.GET_FILE_MANIFESTS) {
+	        } else if(message.messageType == MessageType.GET_FILE_MANIFESTS) {
 				out.writeObject(getFileManifests(message.messageType));
+			} else {
+				throw new RuntimeException("Unknown messageType: " + message.messageType);
 			}
 	        out.close();
 	        soc.close();
@@ -76,15 +76,16 @@ class CloudFileServerSlave implements Runnable {
 		File[] listOfFiles = new File(CloudFileReader.FILE_DIR).listFiles();
 		FileListServerMessage fileManifests = new FileListServerMessage(); 
 		fileManifests.messageType = messageType;
-		for (File file : listOfFiles) {
-			if (file.isFile()) {
-				FileManifest currentFile = new FileManifest();
-				currentFile.fileName = file.getName();
-				currentFile.fileSize = (int) file.length();
-				currentFile.numChunks = (int) Math.ceil((currentFile.fileSize * 1.0/(CloudFileReader.CHUNK_SIZE)));
-				fileManifests.fileManifestList.add(currentFile);
-			}
-		}
+		Arrays.stream(listOfFiles)
+			.filter(File::isFile)
+			.forEach(file -> fileManifests.fileManifestList.add(
+					new FileManifest(file.getName(), (int)file.length())));
+//		for (File file : listOfFiles) {
+//			if (file.isFile()) {
+//				fileManifests.fileManifestList.add(
+//						new FileManifest(file.getName(), (int)file.length()));
+//			}
+//		}
 		return fileManifests;
 	}
 }
