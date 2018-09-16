@@ -103,6 +103,7 @@ public class CloudFileClient {
 				return message;
 			} else if (option == 4) {
 				GetFileClientMessage message = new GetFileClientMessage(getFileName());
+				message.messageType = MessageType.GET_FILE_IN_CHUNKS;
 				message.clientID = getClientID();
 				return message;
 			} else {
