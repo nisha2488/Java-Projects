@@ -9,6 +9,7 @@ import v4.common.CloudFileWriter;
 import v4.common.types.ClientMessage;
 import v4.common.types.FileListServerMessage;
 import v4.common.types.FileManifest;
+import v4.common.types.GetFileChunkClientMessage;
 import v4.common.types.GetFileClientMessage;
 import v4.common.types.MessageType;
 import v4.common.types.ServerMessage;
@@ -49,19 +50,21 @@ public class CloudFileClient {
         ObjectInputStream in = new ObjectInputStream(soc.getInputStream());
     	if(message.messageType == MessageType.GET_FILE_MANIFESTS){
     		out.writeObject(message);
-//    		FileListServerMessage returnMessage = (FileListServerMessage) in.readObject();
     	    readServerFileLists((FileListServerMessage) in.readObject());
     	} else if(message.messageType == MessageType.GET_FILE){
     		GetFileClientMessage clientMessage = (GetFileClientMessage)message; 
     		out.writeObject(clientMessage);
     		downloadServerFile((ServerMessage) in.readObject(), clientMessage.fileName);
+    	} else if(message.messageType == MessageType.GET_FILE_CHUNK){
+    		GetFileChunkClientMessage clientMessage = (GetFileChunkClientMessage)message; 
+    		out.writeObject(clientMessage);
+    		downloadServerFile((ServerMessage) in.readObject(), clientMessage.fileName+clientMessage.chunkNumber);
     	}
-		
 	}
 
 	private void downloadServerFile(ServerMessage returnMessage, String fileName) throws IOException {
 		if(returnMessage.hasError == true) {
-			System.out.println("Invalid File Name");
+			System.err.println("Invalid File Name");
 		} else {
 			new CloudFileWriter().writeFileContents(fileName, returnMessage.message);
 		}
@@ -81,13 +84,14 @@ public class CloudFileClient {
 				message.messageType = MessageType.GET_FILE_MANIFESTS;
 				return message;
 			} else if(option == 2) {
-				GetFileClientMessage message = new GetFileClientMessage(getfileName());
+				GetFileClientMessage message = new GetFileClientMessage(getFileName());
 				message.clientID = getClientID();
 				return message;
 			} else if(option == 3) {
-				ClientMessage message = new ClientMessage();
+				String fileName = getFileName();
+				int chunkNumber = getFileChunk();
+				GetFileChunkClientMessage message = new GetFileChunkClientMessage(fileName, chunkNumber);
 				message.clientID = getClientID();
-				message.messageType = MessageType.GET_FILE_CHUNK;
 				return message;
 			} else {
 				throw new RuntimeException();
@@ -95,7 +99,12 @@ public class CloudFileClient {
 	}
 	
 	
-	private String getfileName() {
+	private Integer getFileChunk() {
+		System.out.print("Enter the chunk you want to download: ");
+		return Integer.parseInt(readStringFromUser());
+	}
+
+	private String getFileName() {
 		System.out.print("Enter the file name to download: ");
 		return readStringFromUser();
 	}

@@ -8,6 +8,7 @@ import v4.common.CloudFileReader;
 import v4.common.types.ClientMessage;
 import v4.common.types.FileListServerMessage;
 import v4.common.types.FileManifest;
+import v4.common.types.GetFileChunkClientMessage;
 import v4.common.types.GetFileClientMessage;
 import v4.common.types.MessageType;
 import v4.common.types.ServerMessage;
@@ -64,10 +65,34 @@ class CloudFileServerSlave implements Runnable {
 			out.writeObject(getFileManifests());
         } else if(message.messageType == MessageType.GET_FILE) {
         	out.writeObject(getFile((GetFileClientMessage)message));
+		} else if(message.messageType == MessageType.GET_FILE_CHUNK) {
+        	out.writeObject(getFileChunk((GetFileChunkClientMessage)message));
 		} else {
 			throw new RuntimeException("Unknown messageType: " + message.messageType);
 		}
 		
+	}
+
+	private ServerMessage getFileChunk(GetFileChunkClientMessage message) throws Exception {
+		ServerMessage returnMessage = new ServerMessage();
+		String fileName = CloudFileReader.FILE_DIR + message.fileName;
+		int chunkNumber = message.chunkNumber;
+		File file = new File(fileName);
+		if(file.exists()) {
+			int totalChunks = (int)(Math.ceil(1.0 * (int)file.length()/CloudFileReader.CHUNK_SIZE));
+			if(chunkNumber < 0 || chunkNumber > totalChunks) {
+				returnMessage.hasError = true;
+				returnMessage.errorCause = "Invalid Chunk Number";
+			} else {
+				returnMessage.hasError = false;
+				returnMessage.message = new CloudFileReader().readFileChunk(fileName, chunkNumber);
+			}
+			
+		} else {
+			returnMessage.hasError = true;
+			returnMessage.errorCause = "Invalid File Name";
+		}
+		return returnMessage;
 	}
 
 	private ServerMessage getFile(GetFileClientMessage message) throws IOException {
