@@ -67,7 +67,7 @@ class CloudFileServerSlave implements Runnable {
 	        out.close();
 	        soc.close();
 		} catch (Throwable t) {
-			System.err.println("Throwable Caught in CloudFileServerSlave:" + t.getMessage());
+			System.err.println("Throwable Caught in CloudFileServerSlave:" + t.getCause());
 		}
 	}
 
@@ -80,7 +80,7 @@ class CloudFileServerSlave implements Runnable {
 				FileManifest currentFile = new FileManifest();
 				currentFile.fileName = file.getName();
 				currentFile.fileSize = (int) file.length();
-				currentFile.numChunks = currentFile.fileSize/(CloudFileReader.CHUNK_SIZE);
+				currentFile.numChunks = (int) (currentFile.fileSize/(CloudFileReader.CHUNK_SIZE));
 				fileManifests.fileManifestList.add(currentFile);
 			}
 		}
