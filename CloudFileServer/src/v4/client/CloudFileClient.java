@@ -64,7 +64,7 @@ public class CloudFileClient {
 
 	private void downloadServerFile(ServerMessage returnMessage, String fileName) throws IOException {
 		if(returnMessage.hasError == true) {
-			System.err.println("Invalid File Name");
+			System.err.println(returnMessage.errorCause);
 		} else {
 			new CloudFileWriter().writeFileContents(fileName, returnMessage.message);
 		}

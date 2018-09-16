@@ -1,0 +1,11 @@
+perty="og:title" content="Different ways of Reading a text file in Java - GeeksforGeeks" />
+<meta property="og:description" content="There are multiple ways of writing and reading a text file. this is required while dealing with many applications. There are several ways to read… Read More &raquo;" />
+<meta property="og:url" content="https://www.geeksforgeeks.org/different-ways-reading-text-file-java/" />
+<meta property="og:site_name" content="GeeksforGeeks" />
+<meta property="article:tag" content="java-file-handling" />
+<meta property="article:tag" content="Java-I/O" />
+<meta property="article:section" content="Java" />
+<meta property="article:published_time" content="2017-04-28T23:15:03+00:00" />
+<meta property="article:modified_time" content="2018-03-24T23:33:52+00:00" />
+<meta property="og:updated_time" content="2018-03-24T23:33:52+00:00" />
+<script type='application/ld+json'>{"@context":"https:\/\/schema.org","@type":"Organization","url":"https:\/\/www.geeksforgeeks.org\/","sameAs":[],"@id":"https:\/\/w
