@@ -96,15 +96,18 @@ public class CloudFileClient {
 	
 	
 	private String getfileName() {
-		System.out.println("Enter the file name to download:");
+		System.out.print("Enter the file name to download: ");
 		return readStringFromUser();
 	}
 	
 	private String readStringFromUser() {
-		Scanner reader = new Scanner(System.in);
-		String input = reader.nextLine();
-		reader.close();	
-		return input;
+		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			return bf.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new RuntimeException();
+		}
 	}
 
 	private String getClientID() {
