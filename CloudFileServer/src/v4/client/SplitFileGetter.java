@@ -122,13 +122,14 @@ class FileChunkAppender implements Runnable {
 		while(chunkNumber < fileManifest.numChunks) {
 			if (buffer.containsKey(chunkNumber)) {
 				try {
+					System.out.println("Trying to append chunk - " + chunkNumber);
 					new CloudFileWriter().appendToFile(fileManifest.fileName, 
 							buffer.get(chunkNumber).chunk);
 					chunkNumber++;
 					numTries = 0;
 				} catch (IOException e) {
 					e.printStackTrace();
-					throw new RuntimeException("Error writing to chunk");
+					throw new RuntimeException("Error writing to chunk - " + chunkNumber);
 				}
 			} else {
 				try {
