@@ -18,7 +18,7 @@ import java.util.Scanner;
 public class CloudFileClient {
 	
 	private String clientID;
-	private static Scanner reader = new Scanner(System.in); 
+//	private static Scanner reader = new Scanner(System.in); 
 	
 	CloudFileClient(String clientID) {	
 		this.clientID = clientID;
@@ -28,10 +28,9 @@ public class CloudFileClient {
 			while (true) {
 				System.out.println("Enter the option number for the information you need from the server: "
 							+ "\n 1. List Server Files \n 2. Download a File \n 3. Download a file Chunk \n 4. Exit Process");
-				int option = reader.nextInt();
+				int option = Integer.parseInt(readStringFromUser());
 				if(option == 4) {
-					System.out.println("Closing client " + clientID); 
-					reader.close();
+					System.out.println("Closing client " + clientID);
 					break;
 				} else {
 					ClientMessage message = buildClientMessage(option);
@@ -97,12 +96,15 @@ public class CloudFileClient {
 	
 	
 	private String getfileName() {
-//		Scanner reader = new Scanner(System.in);
 		System.out.println("Enter the file name to download:");
-		String fileName = reader.nextLine();
-//		reader.close();
-		System.out.println(fileName);
-		return fileName;
+		return readStringFromUser();
+	}
+	
+	private String readStringFromUser() {
+		Scanner reader = new Scanner(System.in);
+		String input = reader.nextLine();
+		reader.close();	
+		return input;
 	}
 
 	private String getClientID() {
