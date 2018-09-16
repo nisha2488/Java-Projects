@@ -23,32 +23,38 @@ public class CloudFileClient {
 			Scanner reader = new Scanner(System.in); 
 			while (true) {
 				System.out.println("Enter the option number for the information you need from the server: "
-							+ "\n 1. Server Time \n 2. Server Address \n 3. List Server Files \n 4. Exit Process");
+							+ "\n 1. List Server Files \n 2. Download a File \n 3. Download a file Chunk \n 4. Exit Process");
 				int option = reader.nextInt();
-				if(option < 4) {
-					ClientMessage message = buildClientMessage(option);
-					Socket soc = new Socket("192.168.56.110", 5217);   
-					ObjectOutputStream out = new ObjectOutputStream(soc.getOutputStream());
-			        out.writeObject(message);
-			        ObjectInputStream in = new ObjectInputStream(soc.getInputStream());
-		        	ServerMessage returnMessage = (ServerMessage) in.readObject();
-		        	if (returnMessage instanceof FileListServerMessage) {
-		        		readServerFileLists((FileListServerMessage)returnMessage);
-		        	} else {
-		        		System.out.println(returnMessage.message);
-		        	}
-				}
 				if(option == 4) {
 					System.out.println("Closing client " + clientID); 
 					reader.close();
 					break;
+				} else {
+					ClientMessage message = buildClientMessage(option);
+					Socket soc = new Socket("192.168.56.110", 5217); 
+					callServerHandler(soc, message);
 				}
+				
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 	}
 	
+	private void callServerHandler(Socket soc, ClientMessage message) throws Exception {
+		ObjectOutputStream out = new ObjectOutputStream(soc.getOutputStream());
+        ObjectInputStream in = new ObjectInputStream(soc.getInputStream());
+    	if(message.messageType == MessageType.GET_FILE_MANIFESTS){
+    		out.writeObject(message);
+    		FileListServerMessage returnMessage = (FileListServerMessage) in.readObject();
+    	    readServerFileLists((FileListServerMessage)returnMessage);
+    	} else if(message.messageType == MessageType.GET_FILE){
+    		ServerMessage returnMessage = (ServerMessage) in.readObject();
+    		
+    	}
+		
+	}
+
 	private void readServerFileLists(FileListServerMessage serverFileList) {
 		for(FileManifest fileObject : serverFileList.fileManifestList) {
 			System.out.println("File Name: " + fileObject.fileName + " | File Size: " + 
@@ -66,13 +72,13 @@ public class CloudFileClient {
 			message.clientID = "Cannot get localHost";
 		}
 		if(option == 1) {
-			message.messageType = MessageType.GET_TIME;
+			message.messageType = MessageType.GET_FILE_MANIFESTS;
 		} 
 		if(option == 2) {
-			message.messageType = MessageType.GET_SERVER_ADDRESS;
+			message.messageType = MessageType.GET_FILE;
 		}
 		if(option == 3) {
-			message.messageType = MessageType.GET_FILE_MANIFESTS;
+			message.messageType = MessageType.GET_FILE_CHUNK;
 		}
 		return message;
 	}

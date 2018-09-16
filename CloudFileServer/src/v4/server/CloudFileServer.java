@@ -60,7 +60,7 @@ class CloudFileServerSlave implements Runnable {
 	        	returnMessage.message = "Server Address: " + InetAddress.getLocalHost();
 	        	out.writeObject(returnMessage);
 	        } else if(message.messageType == MessageType.GET_FILE_MANIFESTS) {
-				out.writeObject(getFileManifests(message.messageType));
+				out.writeObject(getFileManifests());
 			} else {
 				throw new RuntimeException("Unknown messageType: " + message.messageType);
 			}
@@ -72,10 +72,9 @@ class CloudFileServerSlave implements Runnable {
 		}
 	}
 
-	private FileListServerMessage getFileManifests(MessageType messageType) {
+	private FileListServerMessage getFileManifests() {
 		File[] listOfFiles = new File(CloudFileReader.FILE_DIR).listFiles();
-		FileListServerMessage fileManifests = new FileListServerMessage(); 
-		fileManifests.messageType = messageType;
+		FileListServerMessage fileManifests = new FileListServerMessage();
 		Arrays.stream(listOfFiles)
 			.filter(File::isFile)
 			.forEach(file -> fileManifests.fileManifestList.add(

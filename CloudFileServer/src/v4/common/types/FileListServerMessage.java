@@ -7,6 +7,7 @@ public class FileListServerMessage extends ServerMessage {
 	public List<FileManifest> fileManifestList;
 	
 	public FileListServerMessage() {
+		super.messageType = MessageType.GET_FILE_MANIFESTS;
 		this.fileManifestList = new ArrayList<FileManifest>();
 	}
 }
