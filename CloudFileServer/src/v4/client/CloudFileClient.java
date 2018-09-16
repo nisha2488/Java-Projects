@@ -18,12 +18,13 @@ import java.util.Scanner;
 public class CloudFileClient {
 	
 	private String clientID;
+	private static Scanner reader = new Scanner(System.in); 
 	
 	CloudFileClient(String clientID) {	
 		this.clientID = clientID;
 		System.out.println("Starting client " + clientID); 
 		try {
-			Scanner reader = new Scanner(System.in); 
+			
 			while (true) {
 				System.out.println("Enter the option number for the information you need from the server: "
 							+ "\n 1. List Server Files \n 2. Download a File \n 3. Download a file Chunk \n 4. Exit Process");
@@ -96,10 +97,10 @@ public class CloudFileClient {
 	
 	
 	private String getfileName() {
-		Scanner reader = new Scanner(System.in);
+//		Scanner reader = new Scanner(System.in);
 		System.out.println("Enter the file name to download:");
 		String fileName = reader.nextLine();
-		reader.close();
+//		reader.close();
 		System.out.println(fileName);
 		return fileName;
 	}
