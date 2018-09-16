@@ -24,12 +24,7 @@ public class CloudFileClient {
 							+ "\n 1. Server Time \n 2. Server Address \n 3. Exit Process");
 				int option = reader.nextInt();
 				if(option == 1 || option == 2) {
-					ClientMessage message = new ClientMessage();
-					message.clientID = InetAddress.getLocalHost().toString();
-					if(option == 1)
-						message.messageType = MessageType.GET_TIME;
-					else
-						message.messageType = MessageType.GET_SERVER_ADDRESS;
+					ClientMessage message = buildClientMessage(option);
 					Socket soc = new Socket("192.168.56.110", 5217);   
 					ObjectOutputStream out = new ObjectOutputStream(soc.getOutputStream());
 			        out.writeObject(message);
@@ -42,10 +37,27 @@ public class CloudFileClient {
 					reader.close();
 					break;
 				}
-		}
-		}catch (Throwable t) {
+			}
+		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+	}
+	
+	private ClientMessage buildClientMessage(int option) {
+		ClientMessage message = new ClientMessage();
+		try {
+			message.clientID = InetAddress.getLocalHost().toString();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			message.clientID = "Cannot get localHost";
+		}
+		if(option == 1) {
+			message.messageType = MessageType.GET_TIME;
+		} else {
+			message.messageType = MessageType.GET_SERVER_ADDRESS;
+		}
+		return message;
 	}
 	
 	public static void main(String args[]) throws Exception {
