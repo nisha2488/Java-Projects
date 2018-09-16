@@ -31,14 +31,12 @@ public class CloudFileClient {
 					ObjectOutputStream out = new ObjectOutputStream(soc.getOutputStream());
 			        out.writeObject(message);
 			        ObjectInputStream in = new ObjectInputStream(soc.getInputStream());
-			        if(option < 3) {
-			        	ServerMessage returnMessage = (ServerMessage) in.readObject();
-				        System.out.println(returnMessage.message);
-			        }
-			        else {
-			        	FileListServerMessage serverFileList = (FileListServerMessage) in.readObject();
-			        	readServerFileLists(serverFileList);
-			        }
+		        	ServerMessage returnMessage = (ServerMessage) in.readObject();
+		        	if (returnMessage instanceof FileListServerMessage) {
+		        		readServerFileLists((FileListServerMessage)returnMessage);
+		        	} else {
+		        		System.out.println(returnMessage.message);
+		        	}
 				}
 				if(option == 4) {
 					System.out.println("Closing client " + clientID); 
@@ -53,8 +51,8 @@ public class CloudFileClient {
 	
 	private void readServerFileLists(FileListServerMessage serverFileList) {
 		for(FileManifest fileObject : serverFileList.fileManifestList) {
-			System.out.println("File Name: " + fileObject.fileName + " File Size: " + 
-		fileObject.fileSize + " Total Chunks: " + fileObject.numChunks);
+			System.out.println("File Name: " + fileObject.fileName + " | File Size: " + 
+					fileObject.fileSize + " | Total Chunks: " + fileObject.numChunks);
 		}
 	}
 
