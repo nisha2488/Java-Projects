@@ -28,9 +28,9 @@ public class CloudFileClient {
 			
 			while (true) {
 				System.out.println("Enter the option number for the information you need from the server: "
-							+ "\n 1. List Server Files \n 2. Download a File \n 3. Download a file Chunk \n 4. Exit Process");
+							+ "\n 1. List Server Files \n 2. Download a File \n 3. Download a file Chunk \n 4. Download a file in Chunks \n 5. Exit Process");
 				int option = Integer.parseInt(readStringFromUser());
-				if(option == 4) {
+				if(option == 5) {
 					System.out.println("Closing client " + clientID);
 					break;
 				} else {
@@ -99,6 +99,10 @@ public class CloudFileClient {
 				String fileName = getFileName();
 				int chunkNumber = getFileChunk();
 				GetFileChunkClientMessage message = new GetFileChunkClientMessage(fileName, chunkNumber);
+				message.clientID = getClientID();
+				return message;
+			} else if (option == 4) {
+				GetFileClientMessage message = new GetFileClientMessage(getFileName());
 				message.clientID = getClientID();
 				return message;
 			} else {
