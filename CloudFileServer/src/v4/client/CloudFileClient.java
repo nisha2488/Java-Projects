@@ -100,6 +100,7 @@ public class CloudFileClient {
 		System.out.println("Enter the file name to download:");
 		String fileName = reader.nextLine();
 		reader.close();
+		System.out.println(fileName);
 		return fileName;
 	}
 
