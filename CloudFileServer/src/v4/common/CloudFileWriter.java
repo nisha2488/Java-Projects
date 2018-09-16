@@ -26,4 +26,11 @@ public class CloudFileWriter {
 		System.out.println("File downloaded successfully at: " + OUTPUT_DIR);
 	}
 	
+	public void appendToFile(String fileName, String chunkContent) throws IOException {
+		BufferedWriter bw = new BufferedWriter(new FileWriter(OUTPUT_DIR + fileName, true));
+		bw.write(chunkContent);
+		bw.close();
+		System.out.println("Appended chunk to file successfully");
+	}
+	
 }

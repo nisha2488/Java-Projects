@@ -2,7 +2,9 @@ package v4.common.types;
 
 public enum MessageType {
 	GET_FILE_MANIFESTS,
+	GET_SINGLE_FILE_MANIFEST,
 	GET_FILE,
 	GET_FILE_CHUNK,
+	GET_FILE_IN_CHUNKS,
 	CLIENT_CLOSING
 }

@@ -55,6 +55,14 @@ public class CloudFileClient {
     		GetFileClientMessage clientMessage = (GetFileClientMessage)message; 
     		out.writeObject(clientMessage);
     		downloadServerFile((ServerMessage) in.readObject(), clientMessage.fileName);
+    	} else if(message.messageType == MessageType.GET_FILE_IN_CHUNKS){
+    		out.close();
+    		in.close();
+    		soc.close();
+    		GetFileClientMessage clientMessage = (GetFileClientMessage)message; 
+//    		out.writeObject(clientMessage);
+//    		downloadServerFile((ServerMessage) in.readObject(), clientMessage.fileName);
+    		new SplitFileGetter().getFileInChunks(clientMessage);
     	} else if(message.messageType == MessageType.GET_FILE_CHUNK){
     		GetFileChunkClientMessage clientMessage = (GetFileChunkClientMessage)message; 
     		out.writeObject(clientMessage);
@@ -127,8 +135,10 @@ public class CloudFileClient {
 			return "0000"; 
 		}
 	}
+	
+
 
 	public static void main(String args[]) throws Exception {
         new CloudFileClient(UUID.randomUUID().toString());
-    }    
+    }
 }

@@ -10,8 +10,10 @@ import v4.common.types.FileListServerMessage;
 import v4.common.types.FileManifest;
 import v4.common.types.GetFileChunkClientMessage;
 import v4.common.types.GetFileClientMessage;
+import v4.common.types.GetSingleFileManifestClientMessage;
 import v4.common.types.MessageType;
 import v4.common.types.ServerMessage;
+import v4.common.types.SingleFileManifestServerMessage;
 
 public class CloudFileServer {
 	public static void main(String args[]) throws IOException {
@@ -63,6 +65,8 @@ class CloudFileServerSlave implements Runnable {
 	private void sendResponse(ObjectOutputStream out, ClientMessage message) throws Exception {
         if(message.messageType == MessageType.GET_FILE_MANIFESTS) {
 			out.writeObject(getFileManifests());
+        } else if(message.messageType == MessageType.GET_SINGLE_FILE_MANIFEST) {
+			out.writeObject(getSingleFileManifests((GetSingleFileManifestClientMessage)message));
         } else if(message.messageType == MessageType.GET_FILE) {
         	out.writeObject(getFile((GetFileClientMessage)message));
 		} else if(message.messageType == MessageType.GET_FILE_CHUNK) {
@@ -70,6 +74,20 @@ class CloudFileServerSlave implements Runnable {
 		} else {
 			throw new RuntimeException("Unknown messageType: " + message.messageType);
 		}
+		
+	}
+
+	private SingleFileManifestServerMessage getSingleFileManifests(GetSingleFileManifestClientMessage message) {
+		SingleFileManifestServerMessage returnMessage = new SingleFileManifestServerMessage();
+		String fileName = CloudFileReader.FILE_DIR + message.fileName;
+		File file = new File(fileName);
+		if(file.exists()) {
+			returnMessage.fileManifest = new FileManifest(file.getName(), (int)file.length());
+		} else {
+			returnMessage.hasError = true;
+			returnMessage.errorCause = "Invalid File Name";
+		}
+		return returnMessage;
 		
 	}
 
@@ -104,12 +122,13 @@ class CloudFileServerSlave implements Runnable {
 			returnMessage.message = new CloudFileReader().readFileContents(fileName);
 		} else {
 			returnMessage.hasError = true;
-			returnMessage.errorCause = "Invalid File Name!";
+			returnMessage.errorCause = "Invalid File Name";
 		}
 		return returnMessage;
 	}
 
 	private FileListServerMessage getFileManifests() {
+		
 		File[] listOfFiles = new File(CloudFileReader.FILE_DIR).listFiles();
 		FileListServerMessage fileManifests = new FileListServerMessage();
 		Arrays.stream(listOfFiles)
